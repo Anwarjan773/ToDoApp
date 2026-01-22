@@ -3,7 +3,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 const TodoContext = createContext();
 
 export const TodoProvider = ({ children }) => {
-  // ✅ Load from localStorage ONCE
   const [todos, setTodos] = useState(() => {
     try {
       const stored = localStorage.getItem("todos");
@@ -13,16 +12,16 @@ export const TodoProvider = ({ children }) => {
     }
   });
 
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
-  });
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("theme") === "dark",
+  );
 
-  /* ---------- Persist Todos ---------- */
+  const [filter, setFilter] = useState("all"); // ← Add filter state
+
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
-  /* ---------- Persist Theme ---------- */
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -33,10 +32,8 @@ export const TodoProvider = ({ children }) => {
     }
   }, [darkMode]);
 
-  /* ---------- Actions ---------- */
   const addTodo = (text) => {
     if (!text.trim()) return;
-
     setTodos((prev) => [...prev, { id: Date.now(), text, completed: false }]);
   };
 
@@ -45,7 +42,12 @@ export const TodoProvider = ({ children }) => {
 
   const toggleTodo = (id) =>
     setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
+    );
+
+  const updateTodo = (id, newText) =>
+    setTodos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, text: newText } : t)),
     );
 
   const toggleTheme = () => setDarkMode((prev) => !prev);
@@ -57,6 +59,9 @@ export const TodoProvider = ({ children }) => {
         addTodo,
         deleteTodo,
         toggleTodo,
+        updateTodo,
+        filter, // ← expose filter
+        setFilter, // ← expose setFilter
         darkMode,
         toggleTheme,
       }}

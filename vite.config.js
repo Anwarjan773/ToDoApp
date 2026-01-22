@@ -1,8 +1,8 @@
-
 import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
+  base: "/ToDoApp/", // ← Must be at the root, NOT inside Tailwind plugin
   plugins: [
     tailwindcss({
       config: {

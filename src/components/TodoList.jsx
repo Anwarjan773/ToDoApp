@@ -4,16 +4,19 @@ import TodoItem from "./TodoItem";
 import EmptyState from "./EmptyState";
 
 export default function TodoList() {
-  const { todos } = useTodos();
+  const { todos, filter } = useTodos();
 
-  // Empty state
-  if (!todos.length) {
-    return <EmptyState />;
-  }
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === "active") return !todo.completed;
+    if (filter === "completed") return todo.completed;
+    return true; // all
+  });
+
+  if (!filteredTodos.length) return <EmptyState />;
 
   return (
     <ul role="list" aria-label="Todo list" className="space-y-3">
-      {todos.map((todo) => (
+      {filteredTodos.map((todo) => (
         <TodoItem key={todo.id} todo={todo} />
       ))}
     </ul>
